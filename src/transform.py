@@ -74,13 +74,25 @@ def preparar(registros: list[dict], run_id: str) -> pd.DataFrame:
         logger.warning("%d registro(s) rejeitado(s) por falta de campos obrigatórios", rejeitados)
     df = df[valido].copy()
 
+    # Rejeita registros sem os campos mínimos e registra quantos foram
+    valido = (
+        (df["ticket_id"] != "")
+        & (df["escola"] != "")
+        & (df["status"] != "")
+        & df["data_criacao"].notna()
+    )
+    rejeitados = int((~valido).sum())
+    if rejeitados:
+        logger.warning("%d registro(s) rejeitado(s) por falta de campos obrigatórios", rejeitados)
+    df = df[valido].copy()
+
     # Duplicados de Protocolo: fica o registro com atualização mais recente
-        antes = len(df)
+    antes = len(df)
     df = (
         df.sort_values("ultima_atualizacao", na_position="first")
         .drop_duplicates(subset="ticket_id", keep="last")
         .reset_index(drop=True)
-         )
+    )
     if len(df) < antes:
         logger.warning("%d registro(s) duplicado(s) por Protocolo removido(s)", antes - len(df))
 
