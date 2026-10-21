@@ -75,11 +75,12 @@ def preparar(registros: list[dict], run_id: str) -> pd.DataFrame:
     df = df[valido].copy()
 
     # Duplicados de Protocolo: fica o registro com atualização mais recente
-    antes = len(df)
+        antes = len(df)
     df = (
         df.sort_values("ultima_atualizacao", na_position="first")
         .drop_duplicates(subset="ticket_id", keep="last")
-    )
+        .reset_index(drop=True)
+         )
     if len(df) < antes:
         logger.warning("%d registro(s) duplicado(s) por Protocolo removido(s)", antes - len(df))
 
