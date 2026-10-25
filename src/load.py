@@ -1,4 +1,5 @@
 import logging
+from datetime import date
 
 import pandas as pd
 import psycopg
@@ -72,3 +73,18 @@ def carregar_clean(conn: psycopg.Connection, df: pd.DataFrame) -> int:
     with conn.cursor() as cur:
         cur.executemany(SQL_UPSERT_CLEAN, linhas)
     return len(linhas)
+
+def ultima_carga_bem_sucedida(conn: psycopg.Connection) -> date | None:
+    """Data da última execução com status SUCCESS, no fuso de São Paulo."""
+    with conn.cursor() as cur:
+        cur.execute(
+            """
+            SELECT (started_at AT TIME ZONE 'America/Sao_Paulo')::date
+            FROM ops.pipeline_runs
+            WHERE status = 'SUCCESS'
+            ORDER BY started_at DESC
+            LIMIT 1
+            """
+        )
+        linha = cur.fetchone()
+    return linha[0] if linha else None

@@ -2,11 +2,13 @@ import argparse
 import logging
 import os
 import uuid
+from datetime import date
 
 from db import conectar
 from extract import extrair_os
+from incremental import calcular_janela
 from transform import preparar
-from load import criar_run, finalizar_run, salvar_raw, carregar_clean
+from load import criar_run, finalizar_run, salvar_raw, carregar_clean, ultima_carga_bem_sucedida
 from quality import verificar, falhas_criticas, salvar_checks, QualityError
 
 os.makedirs("logs", exist_ok=True)
@@ -62,11 +64,19 @@ def executar(data_inicio: str, data_fim: str) -> None:
 
 def main():
     parser = argparse.ArgumentParser(description="Pipeline de OS do SISOP")
-    parser.add_argument("--inicio", required=True, help="Data inicial MM/DD/AAAA")
-    parser.add_argument("--fim", required=True, help="Data final MM/DD/AAAA")
+    parser.add_argument("--inicio", help="Data inicial MM/DD/AAAA (opcional)")
+    parser.add_argument("--fim", help="Data final MM/DD/AAAA (opcional)")
     args = parser.parse_args()
-    executar(args.inicio, args.fim)
 
+    if args.inicio and args.fim:
+        inicio, fim = args.inicio, args.fim
+        logger.info("Período informado manualmente: %s a %s", inicio, fim)
+    else:
+        with conectar() as conn:
+            ultima = ultima_carga_bem_sucedida(conn)
+        inicio, fim = calcular_janela(ultima, date.today())
+        logger.info("Janela incremental (última carga: %s): %s a %s", ultima, inicio, fim)
 
-if __name__ == "__main__":
-    main()
+    executar(inicio, fim)
+
+    

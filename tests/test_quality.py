@@ -48,10 +48,12 @@ def test_descarte_alto_gera_warning_nao_critica():
 
 def test_dominio_de_status_so_valida_quando_configurado(monkeypatch):
     df = _df(status=["ESTRANHO"])
+
+    monkeypatch.setattr(quality, "STATUS_ESPERADOS", None)
     resultados = verificar(df, extraidos=1)
     assert not any(r.nome == "status_dentro_do_dominio" for r in resultados)
 
-    monkeypatch.setattr(quality, "STATUS_ESPERADOS", {"ABERTA", "FECHADA"})
+    monkeypatch.setattr(quality, "STATUS_ESPERADOS", {"CONCLUÍDO", "PARALISADOS"})
     resultados = verificar(df, extraidos=1)
     assert _por_nome(resultados, "status_dentro_do_dominio").passou is False
 
