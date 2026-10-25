@@ -7,8 +7,8 @@ import requests
 
 logger = logging.getLogger(__name__)
 
-MAX_TENTATIVAS = 3
-TIMEOUT_SEGUNDOS = 30
+MAX_TENTATIVAS = 1
+TIMEOUT_SEGUNDOS = 120
 
 
 class SisopAPIError(Exception):

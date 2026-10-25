@@ -8,7 +8,7 @@ logger = logging.getLogger(__name__)
 
 # Preencha com os valores reais de Status da API.
 # None = não valida o domínio, apenas registra os valores encontrados.
-STATUS_ESPERADOS: set[str] | None = None
+STATUS_ESPERADOS: set[str] | None = {"CONCLUÍDO", "PARALISADOS"}
 
 TOLERANCIA_FUTURO = pd.Timedelta(days=1)
 TAXA_DESCARTE_MAXIMA = 0.05  # 5%
