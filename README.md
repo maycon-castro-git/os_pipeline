@@ -104,7 +104,7 @@ os_pipeline/
 **Prerequisites:** Python 3.12 or 3.13, a PostgreSQL 18 database (for example, on Render), and an API key for the SISOP service.
 
 ```powershell
-git clone [<(https://github.com/maycon-castro-git/os_pipeline.git)>]
+git clone https://github.com/maycon-castro-git/os_pipeline.git
 cd os_pipeline
 python -m venv .venv
 .venv\Scripts\activate
