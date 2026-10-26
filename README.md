@@ -173,8 +173,6 @@ Pages:
 3. **Trend:** monthly tickets created and closed.
 4. **Pipeline health:** success rate of recent runs, rows loaded per run, failed runs.
 
-![Dashboard overview](docs/dashboard.png)
-
 ## Limitations
 
 - The API limits access to 5 calls per day and responds only between 19:00 and 09:00.
