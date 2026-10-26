@@ -27,12 +27,10 @@ COLUNAS_FINAIS = [
     "dias_em_aberto", "regional", "uf",
 ]
 
-
 def _texto(valor) -> str:
     if valor is None or (isinstance(valor, float) and pd.isna(valor)):
         return ""
     return str(valor).strip()
-
 
 def _parse_datas(serie: pd.Series) -> pd.Series:
     """Formato da API: dd/mm/aaaa HH:MM, com fallback para dd/mm/aaaa."""
@@ -40,7 +38,6 @@ def _parse_datas(serie: pd.Series) -> pd.Series:
     com_hora = pd.to_datetime(limpa, format="%d/%m/%Y %H:%M", errors="coerce")
     so_data = pd.to_datetime(limpa, format="%d/%m/%Y", errors="coerce")
     return com_hora.fillna(so_data)
-
 
 def preparar(registros: list[dict], run_id: str) -> pd.DataFrame:
     """Converte os registros da API no formato da tabela clean.os_chamado."""
@@ -53,16 +50,14 @@ def preparar(registros: list[dict], run_id: str) -> pd.DataFrame:
         if coluna not in df.columns:
             df[coluna] = None
 
-    # Datas
+
     for coluna in ["data_criacao", "ultima_atualizacao", "data_finalizacao"]:
         df[coluna] = _parse_datas(df[coluna])
 
-    # Textos
     for coluna in ["ticket_id", "escola", "status", "os_falha", "inep", "id_externo", "ultima_nota"]:
         df[coluna] = df[coluna].map(_texto)
     df["status"] = df["status"].str.upper()
 
-    # Rejeita registros sem os campos mínimos e registra quantos foram
     valido = (
         (df["ticket_id"] != "")
         & (df["escola"] != "")
@@ -74,7 +69,6 @@ def preparar(registros: list[dict], run_id: str) -> pd.DataFrame:
         logger.warning("%d registro(s) rejeitado(s) por falta de campos obrigatórios", rejeitados)
     df = df[valido].copy()
 
-    # Rejeita registros sem os campos mínimos e registra quantos foram
     valido = (
         (df["ticket_id"] != "")
         & (df["escola"] != "")
@@ -86,7 +80,6 @@ def preparar(registros: list[dict], run_id: str) -> pd.DataFrame:
         logger.warning("%d registro(s) rejeitado(s) por falta de campos obrigatórios", rejeitados)
     df = df[valido].copy()
 
-    # Duplicados de Protocolo: fica o registro com atualização mais recente
     antes = len(df)
     df = (
         df.sort_values("ultima_atualizacao", na_position="first")

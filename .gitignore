@@ -6,4 +6,4 @@ logs/
 __pycache__/
 .pytest_cache/
 tests/
-
+.env.example

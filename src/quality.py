@@ -6,8 +6,6 @@ import psycopg
 
 logger = logging.getLogger(__name__)
 
-# Preencha com os valores reais de Status da API.
-# None = não valida o domínio, apenas registra os valores encontrados.
 STATUS_ESPERADOS: set[str] | None = {"CONCLUÍDO", "PARALISADOS"}
 
 TOLERANCIA_FUTURO = pd.Timedelta(days=1)
@@ -17,11 +15,10 @@ TAXA_DESCARTE_MAXIMA = 0.05  # 5%
 class QualityError(Exception):
     """Falha crítica de qualidade: a carga não é executada."""
 
-
 @dataclass
 class ResultadoCheck:
     nome: str
-    severidade: str          # 'CRITICAL' ou 'WARNING'
+    severidade: str          
     passou: bool
     linhas_com_falha: int = 0
     detalhe: str = ""
@@ -35,8 +32,6 @@ def verificar(df: pd.DataFrame, extraidos: int) -> list[ResultadoCheck]:
     resultados: list[ResultadoCheck] = []
     agora = pd.Timestamp.now()
 
-    # --- CRITICAL -------------------------------------------------------
-    # A tabela tem CHECK chk_datas; detectar antes evita erro na carga.
     fim_antes = df["data_finalizacao"].notna() & (df["data_finalizacao"] < df["data_criacao"])
     resultados.append(ResultadoCheck(
         nome="finalizacao_antes_da_criacao",
@@ -64,7 +59,6 @@ def verificar(df: pd.DataFrame, extraidos: int) -> list[ResultadoCheck]:
         linhas_com_falha=int(obrigatorio_nulo.sum()),
     ))
 
-    # --- WARNING --------------------------------------------------------
     if extraidos > 0:
         descartados = extraidos - len(df)
         taxa = descartados / extraidos
