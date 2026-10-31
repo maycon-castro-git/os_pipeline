@@ -4,25 +4,7 @@ A daily data pipeline that extracts service orders (OS) for school network suppo
 
 ## Architecture
 
-```mermaid
-flowchart LR
-    SCH["Task Scheduler<br/>22:00 daily"] --> MAIN["main.py"]
-    MAIN --> INC["incremental.py<br/>date window"]
-    INC --> EXT["extract.py<br/>1 request per day"]
-    API["SISOP API<br/>5 calls/day, 19h to 09h"] --> EXT
-    EXT --> RAW[("raw.os_payload<br/>JSONB")]
-    EXT --> TRF["transform.py"]
-    TRF --> QA{"quality.py<br/>checks"}
-    QA -->|"checks"| OPS[("ops.data_quality_checks")]
-    QA -->|"all critical checks pass"| LOAD["load.py<br/>upsert by ticket_id"]
-    LOAD --> CLEAN[("clean.os_chamado")]
-    LOAD -->|"SUCCESS"| RUNS[("ops.pipeline_runs")]
-    MAIN -.->|"FAILED on critical error"| RUNS
-    CLEAN --> MARTS[("marts views")]
-    RUNS --> MARTS
-    MARTS --> PGA["pgAdmin"]
-    MARTS --> LOOKER["Looker Studio"]
-```
+![Descrição da imagem](https://github.com/maycon-castro-git/os_pipeline/blob/main/dashboard/pipeline/os_pipeline.jpg)
 
 **Layers**
 
